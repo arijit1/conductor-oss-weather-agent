@@ -1,0 +1,76 @@
+{
+  "name": "weather_agent",
+  "description": "A durable weather assistant that discovers MCP weather tools and turns the forecast into a ChatGPT brief.",
+  "version": 5,
+  "schemaVersion": 2,
+  "ownerEmail": "you@example.com",
+  "inputTemplate": {
+    "days": 3,
+    "activity": "Outdoor meeting"
+  },
+  "inputParameters": [
+    "location",
+    "days",
+    "activity",
+    "mcpServerUrl"
+  ],
+  "outputParameters": {
+    "forecast": "${forecast.output.content}",
+    "brief": "${brief.output.result}"
+  },
+  "tasks": [
+    {
+      "name": "discover_weather_tools",
+      "taskReferenceName": "discover",
+      "type": "LIST_MCP_TOOLS",
+      "inputParameters": {
+        "mcpServer": "${workflow.input.mcpServerUrl}"
+      }
+    },
+    {
+      "name": "fetch_weather_forecast",
+      "taskReferenceName": "forecast",
+      "type": "CALL_MCP_TOOL",
+      "inputParameters": {
+        "mcpServer": "${workflow.input.mcpServerUrl}",
+        "method": "weather_forecast",
+        "arguments": {
+          "location": "${workflow.input.location}",
+          "days": "${workflow.input.days}"
+        }
+      }
+    },
+    {
+      "name": "prepare_weather_brief_context",
+      "taskReferenceName": "brief_context",
+      "type": "INLINE",
+      "inputParameters": {
+        "evaluatorType": "graaljs",
+        "activity": "${workflow.input.activity}",
+        "forecastContent": "${forecast.output.content}",
+        "expression": "function main() { var raw = $.forecastContent; var parsed = raw; if (Array.isArray(raw) && raw.length > 0 && raw[0] && raw[0].text) { parsed = JSON.parse(raw[0].text); } var current = parsed.current || {}; var summary = parsed.summary || {}; var forecast = parsed.forecast || []; var lines = []; lines.push('Activity: ' + $.activity); lines.push('Current: ' + (current.weather || 'unknown') + ', ' + (current.temperatureF ?? '?') + 'F, feels like ' + (current.feelsLikeF ?? '?') + 'F'); lines.push('Summary: ' + (summary.activityHint || '')); lines.push('Forecast: ' + forecast.map(function(day) { return day.date + ' - ' + day.weather + ' (' + day.highF + 'F/' + day.lowF + 'F, rain ' + day.rainChance + '%)'; }).join(' | ')); return { briefPrompt: lines.join('\\n') }; } main();"
+      }
+    },
+    {
+      "name": "write_weather_brief",
+      "taskReferenceName": "brief",
+      "type": "LLM_CHAT_COMPLETE",
+      "inputParameters": {
+        "llmProvider": "openai",
+        "model": "gpt-5",
+        "temperature": 0.3,
+        "maxTokens": 1000,
+        "messages": [
+          {
+            "role": "system",
+            "message": "You are a concise weather briefing assistant. Turn the forecast into a practical answer for a user. Mention current conditions, the next few days, and whether the activity looks safe or comfortable. Keep it to 5 short sentences max."
+          },
+          {
+            "role": "user",
+            "message": "${brief_context.output.result.briefPrompt}\n\nWrite a short practical brief for this activity."
+          }
+        ]
+      }
+    }
+  ]
+}

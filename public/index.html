@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Agent Process</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <p class="eyebrow">Conductor OSS · MCP · ChatGPT</p>
+        <h1>Weather agent process</h1>
+        <p class="lede">
+          Enter a location, run the workflow, and watch the steps: Conductor starts, MCP tools are discovered, weather is fetched, and ChatGPT writes the brief.
+        </p>
+      </header>
+
+      <section class="layout">
+        <section class="panel">
+          <h2>Inputs</h2>
+          <form id="weather-form" class="form">
+            <label>
+              <span>Location</span>
+              <input id="location" name="location" type="text" value="Bengaluru" />
+            </label>
+
+            <label>
+              <span>Days</span>
+              <input id="days" name="days" type="number" min="1" max="7" value="3" />
+            </label>
+
+            <label>
+              <span>Activity</span>
+              <input id="activity" name="activity" type="text" value="Outdoor meeting" />
+            </label>
+
+            <label>
+              <span>MCP URL</span>
+              <input id="mcpServerUrl" name="mcpServerUrl" type="text" value="http://localhost:3000/mcp" />
+            </label>
+
+            <div class="actions">
+              <button type="button" id="run-btn">Run workflow</button>
+              <button type="button" id="register-btn" class="secondary">Register workflow</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Process log</h2>
+          <p class="muted">This is the important part of the demo.</p>
+          <ol id="process-log" class="log"></ol>
+          <div class="summary-box">
+            <div class="summary-label">Workflow status</div>
+            <div id="conductor-status" class="summary-value">Idle</div>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel">
+        <h2>Final brief</h2>
+        <pre id="final-brief" class="brief-box">No run yet.</pre>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
