@@ -1,5 +1,8 @@
 # Conductor Weather Agent
 
+<img width="1038" height="950" alt="image" src="https://github.com/user-attachments/assets/c7932f95-05c2-4b16-8205-9e9d9218e941" />
+
+
 A small local demo that shows Conductor OSS orchestrating an MCP weather tool flow and ChatGPT summary.
 
 This repo is meant to be easy to explain in a Medium article:
