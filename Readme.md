@@ -13,6 +13,10 @@ This repo is meant to be easy to explain in a Medium article:
 
 ## What the demo shows
 
+
+https://drive.google.com/file/d/1CVCZF6eO2_sYz4okASsSyzzKW38-upSz/view?usp=sharing
+
+
 The user enters:
 
 - a location
